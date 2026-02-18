@@ -1,0 +1,43 @@
+# Large data files
+*.fastq
+*.fastq.gz
+*.bam
+*.sam
+*.cram
+*.bcf
+*.fasta
+*.fasta.gz
+*.fa
+*.fa.gz
+*.fna
+*.fna.gz
+
+# Intermediate files
+*.bai
+*.bam.bai
+*.log
+*.tmp
+tmp/
+temp/
+
+# R temporary files
+.Rhistory
+.RData
+.Rproj.user
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# But allow small example/test data
+!example_data/
+!test_data/
