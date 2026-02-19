@@ -19,7 +19,6 @@ Following a 13-week structured curriculum covering:
 - ✅ Protein Structure Prediction (AlphaFold2/ColabFold)
 - ✅ Protein Visualization (ChimeraX)
 - ✅ NCBI/UniProt sequence retrieval
-- 🔄 Currently learning: Command Line & Python
 
 ## Projects
 Projects will be added as I progress through my learning schedule.
