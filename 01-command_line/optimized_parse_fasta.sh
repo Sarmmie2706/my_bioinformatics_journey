@@ -48,4 +48,6 @@ do
 done 
 
 cd ..
+# In order not to run into a "File already exists" error in the mkdir command while rerunning the script
+# If you want to keep the parsed files, you can comment the next line out
 rm -r organisms/
