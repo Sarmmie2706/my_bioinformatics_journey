@@ -15,16 +15,9 @@ do
 	if [[ ${line} == ">"* ]]
 	then
 		organism=$(echo ${line} | grep -oP "(?<=OS=).*?(?= OX)" | sed "s/ /_/g")
-		# If the file exists, append the line into it,
-		# If it doesn't, echo the line into a new file
-		if [[ ! -e "organisms/${organism}.fasta" ]]
-		then
-			echo ${line} > "organisms/${organism}.fasta"
-		else
-			echo ${line} >> "organisms/${organism}.fasta"
-		fi
+		echo ${line} >> "organisms/${organism}.fasta"
 	else
-		echo ${line} >> "${organism}.fasta"
+		echo ${line} >> "organisms/${organism}.fasta"
 	fi
 done < uniprot_accession.fasta
 
@@ -49,5 +42,5 @@ done
 
 cd ..
 # In order not to run into a "File already exists" error in the mkdir command while rerunning the script
-# If you want to keep the parsed files, you can comment the next line out
-rm -r organisms/
+# If you want to keep the parsed files, you can uncomment the next line 
+# rm -r organisms/
