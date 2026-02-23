@@ -24,7 +24,7 @@ done < uniprot_accession.fasta
 # Change into the created directory
 cd organisms/
 
-# Read every file in the new directory 
+# Read every fasta file in the new directory 
 for file in *.fasta
 do
 	while IFS= read -r file_line
@@ -41,6 +41,5 @@ do
 done 
 
 cd ..
-# In order not to run into a "File already exists" error in the mkdir command while rerunning the script
-# If you want to keep the parsed files, you can uncomment the next line 
+# In order not to run into a "File already exists" error in the mkdir command while rerunning the script, you can uncomment the next line 
 # rm -r organisms/
