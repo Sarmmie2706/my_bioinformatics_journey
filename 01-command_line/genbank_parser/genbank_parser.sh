@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Rename file with your own file name
+# Rename file with your file name
 file=sequence.gb
 
 # If the file exits, extract unique gene names from the file
