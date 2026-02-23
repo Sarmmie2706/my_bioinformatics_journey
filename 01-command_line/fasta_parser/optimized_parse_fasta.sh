@@ -21,7 +21,7 @@ do
 	fi
 done < uniprot_accession.fasta
 
-# Change into the created directory
+# Change into the newly created directory
 cd organisms/
 
 # Read every fasta file in the new directory 
