@@ -10,7 +10,7 @@ organism=""
 # Read every line in the input file
 while IFS= read -r line
 do
-	# If the line is a header line, set the fasta file to input into
+	# If the line is a header line, set the fasta file to input the line into
 	# If it isn't, append to the current fasta file 
 	if [[ ${line} == ">"* ]]
 	then
@@ -52,3 +52,6 @@ do
 		echo "${line}" >> "organisms/${organism}.fasta"
 	fi
 done < uniprot_accession.fasta
+
+# To prevent file a "File already exists error" if you want to rerun the script, uncomment the last line
+# rm -r organisms
