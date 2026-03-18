@@ -19,6 +19,9 @@ each_codon_freq = {}
 results = []
 now = datetime.now()
 formatted = now.strftime("%Y-%m-%d %H:%M:%S")
+total_sequences = 0
+valid_sequences = 0
+
 
 def validate_cds(sequence, seq_id):
     if str(sequence[:3]) == start_codon and str(sequence[-3:]) in stop_codon and len(sequence)%3 == 0:
@@ -67,28 +70,54 @@ def save_csv(global_codon_counts, frequencies):
     with open("codon_frequency.csv", "w") as file:
         file.write("Codon,Count,Frequency,Percentage\n")
         for codon, value in global_codon_counts.items():
-            file.write(f"{codon},{value},{frequencies[codon]},{frequencies[codon] * 100}%\n")
+            file.write(f"{codon},{value},{frequencies[codon]},{round(frequencies[codon] * 100, 3)}%\n")
 
 def generate_report():
     with open("summary.txt", "w") as file:
         file.write("Codon Usage Analysis Report\n")
         file.write(f"{'=' * 30}\n")
         file.write(f"Generated on: {formatted}\n")
-        file.write(f"Input files: \n")
+        for f in input_files:
+            file.write(f"   - {f}\n")
         file.write(f"   \n")
-        
+        file.write("Summary\n")
+        file.write(f"{'-' * 8}\n")
+        file.write(f"Total sequences analyzed: {total_sequences}\n")
+        file.write(f"Valid coding sequences: {valid_sequences}\n")
+        file.write(f"Start codons\n")
+        file.write(f"{'-' * 8}\n")
+        file.write(f"{start_codon}: {start_count}\n")
+        file.write(f"Stop codons\n")
+        file.write(f"{'-' * 8}\n")
+        file.write(f"{stop_codon[0]}: {taa_count}\n")
+        file.write(f"{stop_codon[1]}: {tag_count}\n")
+        file.write(f"{stop_codon[2]}: {tga_count}\n")
+        file.write("Most common codons\n")
+        file.write(f"{'-' * 8}\n")
+        for a,b in most_common:
+            file.write(f"{a}: {b}\n")
+        file.write("Least common codons\n")
+        file.write(f"{'-' * 8}\n")
+        for a,b in least_common:
+            file.write(f"{a}: {b}\n")
+        file.write("Files created\n")
+        file.write(f"{'-' * 8}\n")
+        file.write("- codon_frequency.csv\n")
+        file.write("- analysis_report.txt\n")
 
 for file in input_files:
     print(f"This is for the {file.upper()} file")
     file_codon_counts = Counter()
     records = SeqIO.parse(file, "fasta")
     for record in records:
+        total_sequences += 1
         sequence = record.seq
         seq_id = record.id
         is_valid, message = validate_cds(sequence, seq_id)  
         print(f"{seq_id}: {message}")
 
         if is_valid:
+            valid_sequences += 1
             codons = extract_codons(sequence)
             codon_counts = count_codons(codons)
             file_codon_counts += codon_counts
@@ -111,3 +140,11 @@ print(f"There are {start_count} start codons and {taa_count} TAA's, {tag_count} 
 frequencies = calculate_frequencies(global_codon_counts, total_num_of_codons)
 print(frequencies)
 
+most_common = global_codon_counts.most_common(5)
+least_common = global_codon_counts.most_common()[-5:]
+
+save_csv(global_codon_counts, frequencies)
+generate_report()
+
+
+# %%
