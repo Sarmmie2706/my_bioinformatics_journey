@@ -140,7 +140,7 @@ ggplot(data.frame(x = indels$vaf), aes(sample = x)) +
   stat_qq() +
   stat_qq_line(colour = "red")
 
-wilcox.test(SNPs$vaf, indels$vaf)
+wilcox_results <- wilcox.test(SNPs$vaf, indels$vaf)
 # Using the wilcox test, as both data are not normally distributed,
 # the test shows a W value of 2,366 and a p-value of 0.8572,
 # meaning that any observed differences in the mean is most likely sue to chance,
@@ -157,11 +157,101 @@ chisq_results$expected
 
 # Does VAF differ across all three mutation groups?
 aov_results <- aov(vaf ~ mutation_type, data = mutations)
-summary(aov_results)
 TukeyHSD(aov_results)
-
+anova_pvalue <- summary(aov_results)[[1]][["Pr(>F)"]][1]
 # the aov results showed a p-value of 0.0276. Tukey's test showed 
-# that the pair with a signifcance difference in means is SNP-CNV.
+# that the pair with a significant difference in means is SNP-CNV.
+
+# Multiple Testing Correction
+all_pvals <- c(wilcox_results$p.value, chisq_results$p.value, anova_pvalue)
+p.adjust(all_pvals, method="BH")
+
+# After correction, the anova p.value increased from 0.0275 to 0.0827, now making it 
+# non-significant. The conclusions of the other two tests remained non-significant, as 
+# the p_values were still > 0.05
+
+sample_data <- mutations %>% 
+  summarise(
+    mut_count = n(),
+    .by = sample_id
+  ) %>% 
+  mutate(
+    age = round(mut_count * 4 + rnorm(40, 30, 5), 0)
+  )
+
+lm_results <- lm(mut_count ~ age, data = sample_data)
+lm_rsquared <- round(summary(lm_results)$r.squared * 100, 2)
+summary(lm_results)$coefficients
+
+ggplot(sample_data, aes(x = age, y = mut_count)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "How Much Can Age Predict Mutation Burden?",
+    subtitle = paste0("This model explains ", lm_rsquared, "% of the variation."),
+    x = "Age",
+    y = "Mutation Count"
+  )
+ggsave(filename = "fig5_mutation_vs_age.png", dpi = 300, height = 5, width = 8)
+# Age significantly predicts mutation burden (β = 0.2205, p < 0.001),
+# and explains a large proportion of the variance (R² = 0.8209)
+
+par(mfrow = c(2,2))
+plot(lm_results)
+
+mutations
+mutation_matrix <- mutations %>% 
+  filter(gene != "OTHER") %>% 
+  count(sample_id, gene, name="mut_count") %>% 
+  pivot_wider(names_from=gene, 
+              values_from=mut_count, 
+              values_fill=0) %>% 
+  column_to_rownames("sample_id")
+
+pca <- prcomp(mutation_matrix, scale. = TRUE)
+pca$x
+pca$sdev
+pca$rotation
+
+var_explained <- (pca$sdev^2) / sum(pca$sdev^2) * 100
+
+# Scree Plot
+scree_df <- data.frame(
+  PC      = 1:length(var_explained),
+  variance = var_explained
+)
+
+p1 <- ggplot(scree_df, aes(x=PC, y=variance)) +
+  geom_bar(stat="identity", fill="#2E75B6") +
+  geom_line(colour="red") +
+  geom_point(colour="red") +
+  labs(title="Scree Plot", 
+       x="Principal Component",
+       y="Variance Explained (%)") +
+  theme_bw()
+
+p2 <- ggplot(data.frame(pca$x), aes(x = PC1, y = PC2)) +
+  geom_point() +
+  labs(
+    title = "PC1 vs PC2",
+    x = paste0("PC1 (", round(var_explained[1],1), "% variance)"),
+    y = paste0("PC2 (", round(var_explained[2],1), "% variance)")
+  ) +
+  theme_classic()
+
+p1 + p2 + plot_annotation(
+  title = "Sample Mutation Profiles using PCA"
+)
+ggsave(
+  filename = "fig6_pca_sample_mutation_profiles.png",
+  dpi = 300, height = 5, width = 9
+)
+# Which genes contribute most to PC1?
+loadings_pc1 <- pca$rotation[,"PC1"]
+sort(abs(loadings_pc1), decreasing=TRUE)[1:10]
+# These are the 10 genes driving the most variation on PC1
+
+
 
 
 
