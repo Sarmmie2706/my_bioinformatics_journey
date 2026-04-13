@@ -119,3 +119,7 @@ samtools stats results/sorted/SRR062634_markdup.bam \
 
 # Summary numbers only
 grep "^SN" results/stats/SRR062634_stats.txt | head -30
+
+# Open igv using the command igv to see the alignment visually. 
+igv
+# Note: This can also be donre directly from the destop app or the web app. It only requires loading the reference genome, alignment file and their indexes

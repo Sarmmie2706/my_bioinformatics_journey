@@ -79,12 +79,15 @@ For a 20k read subset, duplication is expected to be minimal.
 ## 7. TP53 Region
 - Coordinates: chr17:7,661,779-7,687,538
 - Reads mapping to this region: 8
-- Mean coverage at locus: 1.061%
+- Mean coverage at locus: 1.061
 
 ---
 
 ## 8. IGV Visualisation
-*To be completed tomorrow after reviewing alignment visualization.*
+- The view in results/igv/SRR062634_igv.png covers position 7,679,070-7,679,350. With a mean read depth of 1.061,
+the histogram only scaled from 0-2, with paired reads having the read depth of 2.
+- Mismatches were seen ar some positions. A->G SNPs were seen at positions 7,679,197 and 7,679,201. A T->A SNP was also seen in position 7,679,198.
+- A read which runs from position 7,679,282-7,679,316 is classifies as discordant, because its mate is about 36 million bp away, around position 42Mb.
 
 ---
 
