@@ -2,6 +2,10 @@
 
 set -eu
 
+# Activate environment and change directories
+conda activate bioinfo
+cd projects/bioinformatics_portfolio/04-ngs_analysis/02_alignment
+
 # Create directories
 mkdir -p reference scripts results/{aligned,sorted,stats} logs
 
