@@ -63,13 +63,38 @@ bcftools view -H results/variants/NA12878_somatic.vcf.gz | wc -l
 bcftools view -H results/variants/NA12878_somatic_filtered.vcf.gz | wc -l
 # None of the variants passed the Mutect2 calls so manual filtering will be done using other metrics
 
+# Filtering based on read depth (DP), allele frequency (AF), and Tumour log odds (TLOD) and view file
+bcftools view \
+    -i 'FORMAT/DP[0:0]>=5 && FORMAT/AF[0:0]>=0.05 && INFO/TLOD>=6.3' \
+     results/variants/NA12878_somatic.vcf.gz \
+    -o results/variants/NA12878_somatic_filtered.vcf.gz -Oz
 
+bcftools view -H results/variants/NA12878_somatic_filtered.vcf.gz | head 
 
+# Extract important columns and save to a table and view contents
+bcftools query \
+    -f '%CHROM\t%POS\t%REF\t%ALT\t[%DP]\t[%AF]\n' \
+     results/variants/NA12878_somatic_filtered.vcf.gz \
+    -o results/variants/NA12878_somatic_variants_table.tsv
 
+head -20 results/variants/NA12878_somatic_variants_table.tsv 
 
+# Create header file and concatenate to the saved variant table
+echo -e "CHROM\tPOS\tREF\tALT\tDP\tAF" > results/variants/header.txt
+cat results/variants/header.txt results/variants/NA12878_somatic_variants_table.tsv > results/variants/NA12878_somatic_variant_table.tsv 
+head -20 results/variants/NA12878_somatic_variant_table.tsv 
 
+# Remove variant table without header file to prevent confusion
+rm results/variants/NA12878_somatic_variants_table.tsv 
 
+# SAve stats and view contents using grep
+bcftools stats results/variants/NA12878_somatic_filtered.vcf.gz > results/variants/NA12878_somatic_stats.txt
+grep "^SN" results/variants/NA12878_somatic_stats.txt 
+grep "^TSTV" results/variants/NA12878_somatic_stats.txt 
 
+# Normalise and view normalised data
+bcftools norm -f data/hg38.fa -m -any results/variants/NA12878_somatic_filtered.vcf.gz -o results/variants/NA12878_somatic_normalised.vcf.gz -Oz
+bcftools view -H results/variants/NA12878_somatic_normalised.vcf.gz | wc -l
 
 
 
