@@ -1,0 +1,36 @@
+Codon Usage Analysis Report
+==============================
+Generated on: 2026-04-19 00:07:13
+   - test_data/test_genes2.fasta
+   - test_data/test_genes1.fasta
+   
+Summary
+--------
+Total sequences analyzed: 16
+Valid coding sequences: 12
+--------
+Start codons
+ATG: 27
+--------
+Stop codons
+TAA: 14
+TAG: 4
+TGA: 2
+--------
+Most common codons
+CGG: 95
+CAG: 42
+GAA: 35
+GAT: 32
+ATG: 27
+--------
+Least common codons
+GTC: 2
+TGA: 2
+CGT: 1
+CAC: 1
+CGA: 1
+--------
+Files created
+- codon_frequency.csv
+- analysis_report.txt

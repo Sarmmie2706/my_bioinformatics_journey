@@ -1,0 +1,7 @@
+Summary Statistics
+=================================================================
+Total Sequence: 3
+Average length: 39.67bp
+Average GC%: 51.24bp
+Longest: 42 bp (seq1)
+Shortest: 37 bp (seq3)
