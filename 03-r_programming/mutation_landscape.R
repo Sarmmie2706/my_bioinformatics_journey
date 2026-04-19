@@ -1,9 +1,11 @@
 library(tidyverse)
 library(patchwork)
 
+# Set seed for reproducibility
 set.seed(99)
 n_mutations <- 200
 
+# Create gene pool and mutations dataframe
 gene_pool <- c(
   rep("TP53",   25), rep("KRAS",   20), rep("BRCA1",  15),
   rep("EGFR",   14), rep("MYC",    12), rep("PTEN",   10),
@@ -32,6 +34,7 @@ mutations <- data.frame(
 )
 gene_pool
 mutations
+
 # Make VAF realistic — scale to 0-1
 mutations$vaf <- round(mutations$vaf, 3)
 
@@ -39,6 +42,7 @@ head(mutations)
 str(mutations)
 summary(mutations)
 
+# Basic statistics of the mutations dataframe
 cat(sprintf("%s %d", "Total number of mutations:", nrow(mutations)))
 cat(sprintf("%s %d", "Total number of genes affected:", length(unique(mutations$gene))))
 cat(sprintf("%s %d", "Total number of samples:", length(unique(mutations$sample_id))))
@@ -56,7 +60,7 @@ mutations %>%
   ) %>% 
   print()
 
-# Mutation Type Distribution
+# Mutation Type Distribution, plot, and save the file 
 type_counts <- mutations %>% 
   filter(gene != "OTHER") %>% 
   summarise(
@@ -82,6 +86,7 @@ mutation_counts <- mutations %>%
     pct = (counts / sum(counts)) * 100
   )
 
+# Create and combine bar and pie chart for most common mutation types and save
 p1 <- ggplot(mutation_counts, aes(mutation_type, counts, fill = mutation_type)) +
   geom_bar(stat = "identity") +
   theme(legend.position = "none") +
@@ -101,7 +106,7 @@ p1 + p2 + plot_annotation(
   plot_layout(guides = "collect")
 ggsave(filename = "fig2_mutation_types.png", dpi = 300, height = 5, width = 8)
 
-# VAF distribution by mutation type
+# Plot VAF distribution by mutation type
 ggplot(mutations, aes(x = mutation_type, y = vaf)) +
   geom_violin(aes(fill = mutation_type)) +
   geom_boxplot(width = 0.1) +
@@ -115,7 +120,7 @@ ggplot(mutations, aes(x = mutation_type, y = vaf)) +
   theme_classic()
 ggsave(filename = "fig3_vaf_distribution.png", dpi = 300, height = 5, width = 8)
 
-# Chromosome Distribution
+# Plot Chromosome Distribution showing each cancer's proportion
 ggplot(mutations, aes(x = factor(chromosome, levels = 1:22), fill = cancer_type)) +
   geom_bar(position = "fill") +
   labs(
@@ -128,6 +133,7 @@ ggsave(filename = "fig4_chromosome_distribution.png", dpi = 300, height = 5, wid
 
 ########## STATISTICAL TESTS #############
 # Do SNPs have higher VAF than Indels?
+# Testing the normality of the variant types using shapiro-wilk test and visualisation
 SNPs <- mutations %>% 
   filter(mutation_type == "SNP")
 shapiro.test(SNPs$vaf)
@@ -147,6 +153,7 @@ wilcox_results <- wilcox.test(SNPs$vaf, indels$vaf)
 # and hence, we fail to reject the null hypothesis.
 
 # Is mutation type independent of cancer type?
+# Using chi_square if a ssignificant relationship exists between mutation type and cancer type
 mutation_cancer_table <- table(mutations$mutation_type, mutations$cancer_type)
 chisq_results <- chisq.test(mutation_cancer_table)
 chisq_results
@@ -162,7 +169,7 @@ anova_pvalue <- summary(aov_results)[[1]][["Pr(>F)"]][1]
 # the aov results showed a p-value of 0.0276. Tukey's test showed 
 # that the pair with a significant difference in means is SNP-CNV.
 
-# Multiple Testing Correction
+# Multiple Testing Correction for all the p_values
 all_pvals <- c(wilcox_results$p.value, chisq_results$p.value, anova_pvalue)
 p.adjust(all_pvals, method="BH")
 
@@ -170,6 +177,8 @@ p.adjust(all_pvals, method="BH")
 # non-significant. The conclusions of the other two tests remained non-significant, as 
 # the p_values were still > 0.05
 
+
+# Added an age column using the mutation count
 sample_data <- mutations %>% 
   summarise(
     mut_count = n(),
@@ -179,10 +188,12 @@ sample_data <- mutations %>%
     age = round(mut_count * 4 + rnorm(40, 30, 5), 0)
   )
 
+# Using a linear regression model to predict how much age affects mutation count
 lm_results <- lm(mut_count ~ age, data = sample_data)
 lm_rsquared <- round(summary(lm_results)$r.squared * 100, 2)
 summary(lm_results)$coefficients
 
+# Visualize the relationship using geom_smooth and save
 ggplot(sample_data, aes(x = age, y = mut_count)) +
   geom_point() +
   geom_smooth(method = "lm") +
@@ -199,7 +210,7 @@ ggsave(filename = "fig5_mutation_vs_age.png", dpi = 300, height = 5, width = 8)
 par(mfrow = c(2,2))
 plot(lm_results)
 
-mutations
+# Create a matrix to run principal component analysis
 mutation_matrix <- mutations %>% 
   filter(gene != "OTHER") %>% 
   count(sample_id, gene, name="mut_count") %>% 
@@ -213,6 +224,7 @@ pca$x
 pca$sdev
 pca$rotation
 
+# Derive variance explained from the pca result's standard deviation
 var_explained <- (pca$sdev^2) / sum(pca$sdev^2) * 100
 
 # Scree Plot

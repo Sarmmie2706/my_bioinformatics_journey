@@ -1,5 +1,6 @@
 library(tidyverse)
 
+# Create cancer database
 cancer_db <- data.frame(
   name       = c("TP53","BRCA1","KRAS","EGFR","MYC","PTEN",
                  "RB1","APC","BRAF","PIK3CA","CDKN2A","ERBB2"),
@@ -21,6 +22,7 @@ cancer_db <- data.frame(
 )
 cancer_db
 
+# Function that returns gene's properties in the database
 lookup_gene <- function(gene) {
   if (!(gene %in% cancer_db$name)) {
     print("Gene not present in database")
@@ -37,6 +39,7 @@ lookup_gene <- function(gene) {
 lookup_gene("BRAF")
 lookup_gene("NOGENE")
 
+# Function that returns the number of genes on a chromosome
 genes_on_chromosome <- function(chr) {
   if (!(chr %in% cancer_db$chromosome)) {
     print("Chromosome not present in database")
@@ -51,6 +54,7 @@ genes_on_chromosome <- function(chr) {
 genes_on_chromosome(5)
 genes_on_chromosome(170)
 
+# Returns the mean length and gc_content by type
 summary_by_type <- function() {
   cancer_db %>% 
     group_by(type) %>% 
@@ -62,6 +66,8 @@ summary_by_type <- function() {
 }
 summary_by_type()
 cancer_db
+
+# Adds a new gene to the database and returns the new database
 add_gene <- function(db, name, full_name, length, chromosome, gc_content, type) {
   if (name %in% db$name) {
     cat(sprintf("Warning: %s already exists in the database", name))
@@ -81,6 +87,7 @@ add_gene <- function(db, name, full_name, length, chromosome, gc_content, type) 
 cancer_db <- add_gene(cancer_db, "VEGFA", "Vascular Endothelial Growth Factor A", 1472, 6, 50.3, "Oncogene")
 cancer_db
 
+# Classifying genes based on the length
 classify_gene <- function(length) {
   if (length < 500) {
     return("Small")
@@ -91,6 +98,7 @@ classify_gene <- function(length) {
   }
 }
 
+# CLassify all genes in the database based on their lengths
 classify_all <- function() {
   invisible(sapply(1:nrow(cancer_db), function(i) {
    cat(sprintf("%-8s %-45s %s\n", 
