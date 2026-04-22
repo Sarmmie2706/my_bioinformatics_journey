@@ -72,7 +72,6 @@ bcftools, VEP, IGV, COSMIC, ClinVar, gnomAD
 
 Topics I plan to explore beyond this curriculum:
 
-- RNA-seq differential expression with DESeq2
 - TCGA and cBioPortal data mining
 - Mutational signature analysis (SigProfiler)
 - Workflow management with Snakemake or Nextflow
