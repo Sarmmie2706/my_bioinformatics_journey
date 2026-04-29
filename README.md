@@ -6,8 +6,8 @@ My journey learning bioinformatics for cancer genomics research.
 
 ## About Me
 
-Aspiring cancer bioinformatician who has completed a structured 
-13-week curriculum focused on cancer genomics. My background includes 
+Aspiring bioinformatician who has completed a structured 
+13-week curriculum as outlined below. My background includes 
 protein structure analysis and sequence-based bioinformatics, and I 
 have built computational and NGS genomics skills to complement that 
 foundation.
