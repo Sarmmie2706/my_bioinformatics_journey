@@ -14,7 +14,7 @@ gatk HaplotypeCaller \
 # Count the number of variants
 bcftools view -H results/variants/germline/SRR062634_germline.vcf.gz | wc -l
 
-# Run the HaplotypeCaller that detects germline mutation. The tp53 region on the chromosome was also selected
+# Run the HaplotypeCaller that detects somatic mutation. The tp53 region on the chromosome was also selected
 gatk Mutect2 \
     -R ../02_alignment/reference/chr17.fa \
     -I ../o2_alignment/results/sorted/SRR062634_markdup.bam \
