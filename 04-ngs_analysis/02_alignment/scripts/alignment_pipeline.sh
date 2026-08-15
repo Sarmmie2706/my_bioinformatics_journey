@@ -112,7 +112,7 @@ samtools index results/sorted/SRR062634_tp53.bam
 samtools flagstat results/sorted/SRR062634_tp53.bam
 
 # Mean depth coverage
-samtools depth results/sorted/SRR062634_tp53.bam     | awk '{sum+=; count++} END {print Mean depth:, sum/count}'
+samtools depth results/sorted/SRR062634_tp53.bam     | awk '{sum+=3; count++} END {print Mean depth:, sum/count}'
 
 # Reads that mapped to the region
 samtools view -c results/sorted/SRR062634_markdup.bam chr17:7661779-7687538
